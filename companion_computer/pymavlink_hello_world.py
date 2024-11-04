@@ -177,7 +177,7 @@ def send_random_data(lat,lon,alt):
     print(f"Sending random data: {random_number}")
     master.mav.statustext_send(
         mavutil.mavlink.MAV_SEVERITY_INFO,
-        f"{{lat:{lat}, lon:{lon}, RandomData:{random_number}}}".encode('utf-8'),0,0
+        f"{{\"lat\":{lat}, \"lon\":{lon}, \"RF_Value\":{random_number}}}".encode('utf-8'),0,0
     )
 
 # Main
@@ -192,7 +192,7 @@ try:
     for waypoint in waypoints:
         fly_to_location(*waypoint)
         print("-- Hovering at point, starting measurements")
-        time.sleep(5)  # Simulate hover
+        time.sleep(5)  # Simulate hover and time to take measurement
         # Send random data to the ground control station
         send_random_data(*waypoint)
 

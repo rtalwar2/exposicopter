@@ -9,7 +9,8 @@ print("Listening for MAVLink messages...")
 # Continuously read MAVLink messages
 while True:
     # Wait for a MAVLink message
-    msg = mavlink_connection.recv_match(blocking=True)
+    msg = mavlink_connection.recv_match(type="STATUSTEXT",blocking=True)
+    print(msg)
     if msg:
         # Print the received message type and content
         # print(f"Received message: {msg.get_type()}")

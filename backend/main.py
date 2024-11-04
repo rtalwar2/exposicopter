@@ -1,0 +1,77 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+from pymavlink import mavutil
+import threading
+import uvicorn
+import json
+import csv
+from datetime import datetime
+from fastapi.staticfiles import StaticFiles
+
+
+app = FastAPI()
+
+# Measurement data model
+class Measurement(BaseModel):
+    lat: float
+    lon: float
+    value: float
+
+# Global variable to store the latest measurements
+measurements = []
+# Create a CSV file with the current date and time
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+csv_filename = f"measurements_{current_time}.csv"
+
+
+# Function to listen to MAVLink messages and update the measurements list
+def listen_for_mavlink():
+    global measurements
+    mavlink_connection = mavutil.mavlink_connection('udp:127.0.0.1:14550')
+    print("waiting for heartbeat, please start mavlink mirorring")
+    mavlink_connection.wait_heartbeat()
+    print("Heartbeat received. MissionPlanner connected!")
+    print("Listening for MAVLink messages...")
+
+    while True:
+        msg = mavlink_connection.recv_match(type='STATUSTEXT',blocking=True)
+        if msg:
+            text_data = msg.to_dict()["text"]
+            # Check if the text data matches the expected format
+            if "RF_Value" in text_data:
+                try:
+                    print(text_data)
+                    json_data = json.loads(text_data)
+                    print(json_data.keys())
+                    # Add the new measurement to the list
+                    measurements.append(Measurement(lat=json_data['lat'], lon=json_data["lon"], value=json_data["RF_Value"]))
+
+                    # write to csv
+                    with open(csv_filename, mode='a', newline='') as csv_file:
+                        writer = csv.writer(csv_file)
+                        writer.writerow([json_data['lat'], json_data["lon"], json_data["RF_Value"]])
+                except ValueError:
+                    print("Failed to parse measurement data")
+
+
+
+
+@app.get("/sensor_data", response_model=list[Measurement])
+def read_sensor_data() -> list[Measurement]:
+    return measurements
+
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
+
+
+def create_csv():
+    # Initialize the CSV file with headers
+    with open(csv_filename, mode='w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["Latitude", "Longitude", "Value"])
+
+if __name__ == '__main__':
+    create_csv()
+    # Start the MAVLink listener in a separate thread
+    thread = threading.Thread(target=listen_for_mavlink, daemon=True)
+    thread.start()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
