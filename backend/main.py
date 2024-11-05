@@ -40,9 +40,9 @@ def listen_for_mavlink():
             # Check if the text data matches the expected format
             if "RF_Value" in text_data:
                 try:
-                    print(text_data)
+                    # print(text_data)
                     json_data = json.loads(text_data)
-                    print(json_data.keys())
+                    # print(json_data.keys())
                     # Add the new measurement to the list
                     measurements.append(Measurement(lat=json_data['lat'], lon=json_data["lon"], value=json_data["RF_Value"]))
 
@@ -52,9 +52,10 @@ def listen_for_mavlink():
                         writer.writerow([json_data['lat'], json_data["lon"], json_data["RF_Value"]])
                 except ValueError:
                     print("Failed to parse measurement data")
+                    print(text_data)
 
 
-
+    
 
 @app.get("/sensor_data", response_model=list[Measurement])
 def read_sensor_data() -> list[Measurement]:
