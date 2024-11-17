@@ -22,20 +22,65 @@ function init_map(){
     }).addTo(map);
 }
 
-// // Function to interpolate points between two coordinates
-// function interpolatePoints(start, end, numPoints) {
-//     const points = [];
-//     for (let i = 0; i <= numPoints; i++) {
-//         const fraction = i / numPoints;
-//         const lat = start.lat + fraction * (end.lat - start.lat);
-//         const lon = start.lon + fraction * (end.lon - start.lon);
-//         const value = start.value + fraction * (end.value - start.value);
-//         points.push({ lat, lon, value });
-//     }
-//     return points;
-// }
+function onFileChange(event){
+    const file = event.target.files[0]; 
+    // setting up the reader
+    const  reader = new FileReader();
+    reader.readAsText(file,'UTF-8');
+    // here we tell the reader what to do when it's done reading...
+    reader.onload = readerEvent => {
+        const content = readerEvent.target.result;
+        // Split the CSV content into rows
+        const rows = content.split('\n').filter(row => row.trim() !== '');
+        // Remove the header row (first row)
+        rows.shift();
+        // Map each row to a JSON object
+        const data = rows.map(row => {
+            const [lat, lon, value] = row.split(',').map(item => item.trim());
+            return {
+                lat: parseFloat(lat),
+                lon: parseFloat(lon),
+                value: parseFloat(value)
+            };
+        });
+        console.log(data); // Array of JSON objects
+        showPlotlyData(data);
+        showMapData(data);
+    }
+}
 
-function showData(data){
+function showPlotlyData(data){
+    Plotly.newPlot('heatmap', [{
+        x: data.map(d => d.lon),
+        y: data.map(d => d.lat),
+        mode: 'markers',
+        type: 'scatter',
+        marker: {
+            color: data.map(d => d.value),  // Color points based on their value
+            colorscale: 'Jet',              // Use a color scale for heatmap effect
+            showscale: true                     // Show the color scale legend
+        },
+        text: data.map(d => `Value: ${d.value}`)
+    }], {
+        title: 'Heatmap of Measurements',
+        xaxis: {
+            scaleanchor: 'y',    // Lock aspect ratio to y-axis
+            scaleratio: 1,        // Ensure 1:1 ratio with the y-axis
+            showline: false,
+            showgrid: false,
+            zeroline: false,
+        },
+        yaxis: {
+            scaleanchor: 'x',    // Lock aspect ratio to x-axis
+            scaleratio: 1,        // Ensure 1:1 ratio with the x-axis
+            showline: false,
+            showgrid: false,
+            zeroline: false,
+        }
+    });
+}
+
+function showMapData(data){
     if (!data_shown){
         const firstDataPoint = data[0];
         map.flyTo([firstDataPoint.lat, firstDataPoint.lon], 19, {
@@ -51,25 +96,6 @@ function showData(data){
         );
     });
     console.log(newData)
-    // Add new data points to the heatmap
-    // Interpolate between points and add each interpolated point individually to the heatmap layer
-    // newData.forEach((point, index) => {
-    //     if (index > 0) {
-    //         // Get the previous point
-    //         const prevPoint = newData[index - 1];
-    //         // Interpolate between prevPoint and current point
-    //         const interpolatedPoints = interpolatePoints(prevPoint, point, 5);  // 5 interpolated points between each pair
-    //         interpolatedPoints.forEach(interpolatedPoint => {
-    //             heatmapLayer.addLatLng([interpolatedPoint.lat, interpolatedPoint.lon, interpolatedPoint.value]);
-    //             existingData.push(interpolatedPoint);
-    //         });
-    //     }
-
-    //     // Add the current point
-    //     heatmapLayer.addLatLng([point.lat, point.lon, point.value]);
-    //     existingData.push(point);  // Add to the existing data tracker
-    // });
-
     // Add each new data point individually to the heatmap layer
     newData.forEach(point => {
         heatmapLayer.addLatLng([point.lat, point.lon, point.value]);
@@ -90,18 +116,25 @@ function loadData(){
             return response.json();
         })
         .then(data => {
-            // console.log("this is the data", data);
-            showData(data);
+            console.log("this is the data", data);
+            showPlotlyData(data);
+            showMapData(data);
         })
         .catch(error => {
             // Handle error
             console.error('There was a problem with the retrieval of the data:', error);
         });
 }
+function selectFile(){
+    document.querySelector("#fileSelector").click()
+}
 
 function main() {
     init_map();
-    setInterval(()=>{setTimeout(loadData,1)}, 2000);
+    // setInterval(()=>{setTimeout(loadData,1)}, 2000);
+    // console.log(kaas)
+    document.querySelector("#fileSelectorBtn").addEventListener("click",selectFile)
+    document.querySelector("#fileSelector").addEventListener("change",onFileChange)
 }
 
 main()

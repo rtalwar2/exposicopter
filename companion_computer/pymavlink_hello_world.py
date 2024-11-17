@@ -221,7 +221,7 @@ class Drone:
 
 if __name__ == "__main__":
     # Connect to the vehicle via serial or UDP (adjust as needed)
-    connection_string = 'tcp:192.168.129.7:5762'  # Adjust for your setup
+    connection_string = 'tcp:172.17.240.253:5762'  # Adjust for your setup
     drone = Drone(connection_string)
 
     waypoints = drone.download_mission()
