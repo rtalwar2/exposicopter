@@ -49,6 +49,30 @@ function onFileChange(event){
     }
 }
 
+
+function postLocationforInspection(point){
+    const url = "http://127.0.0.1:8000/inspect"
+    fetch(url, {
+        method: 'POST',
+        body : point
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("this is the data", data);
+            showPlotlyData(data);
+            showMapData(data);
+        })
+        .catch(error => {
+            // Handle error
+            console.error('There was a problem with the retrieval of the data:', error);
+        });
+}
+
 function showPlotlyData(data){
     Plotly.newPlot('heatmap', [{
         x: data.map(d => d.lon),
@@ -78,6 +102,13 @@ function showPlotlyData(data){
             zeroline: false,
         }
     });
+    if(!data_shown){
+        document.querySelector("#heatmap").on('plotly_click', function(data){
+            const pt = data.points[0]
+            console.log(pt.x ,pt.y )
+            postLocationforInspection({"lat": pt.y,"lon": pt.x})
+        });
+    }
 }
 
 function showMapData(data){
@@ -104,27 +135,8 @@ function showMapData(data){
 
 }
 
-function loadData(){
-    const url = "http://127.0.0.1:8000/sensor_data"
-    fetch(url, {
-        method: 'GET'
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("this is the data", data);
-            showPlotlyData(data);
-            showMapData(data);
-        })
-        .catch(error => {
-            // Handle error
-            console.error('There was a problem with the retrieval of the data:', error);
-        });
-}
+
+
 function selectFile(){
     document.querySelector("#fileSelector").click()
 }
@@ -135,6 +147,7 @@ function main() {
     // console.log(kaas)
     document.querySelector("#fileSelectorBtn").addEventListener("click",selectFile)
     document.querySelector("#fileSelector").addEventListener("change",onFileChange)
+
 }
 
 main()

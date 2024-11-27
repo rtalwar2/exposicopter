@@ -7,7 +7,13 @@ import json
 import csv
 from datetime import datetime
 from fastapi.staticfiles import StaticFiles
+import sys
+import os
+# Add the parent directory (where "Drone" resides) to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+# Import the Drone class from Drone/Drone.py
+from Drone.Drone import Drone
 
 app = FastAPI()
 
@@ -17,24 +23,29 @@ class Measurement(BaseModel):
     lon: float
     value: float
 
+# location data model
+class Location(BaseModel):
+    lat: float
+    lon: float
+
 # Global variable to store the latest measurements
 measurements = []
 # Create a CSV file with the current date and time
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 csv_filename = f"measurements_{current_time}.csv"
-
+drone=None
 
 # Function to listen to MAVLink messages and update the measurements list
 def listen_for_mavlink():
     global measurements
-    mavlink_connection = mavutil.mavlink_connection('udp:127.0.0.1:14550')
-    print("waiting for heartbeat, please start mavlink mirorring")
-    mavlink_connection.wait_heartbeat()
-    print("Heartbeat received. MissionPlanner connected!")
+    global drone
+    print("waiting for heartbeat, please proxy server")
+    connection_string = "udp:192.168.0.124:14550"
+    drone = Drone(connection_string)
     print("Listening for MAVLink messages...")
 
     while True:
-        msg = mavlink_connection.recv_match(type='STATUSTEXT',blocking=True)
+        msg = drone.connection.recv_match(type='STATUSTEXT',blocking=True)
         if msg:
             text_data = msg.to_dict()["text"]
             # Check if the text data matches the expected format
@@ -55,7 +66,10 @@ def listen_for_mavlink():
                     print(text_data)
 
 
-    
+@app.post("/inspect")
+def inspect_location(loc:Location):
+    print(loc)
+
 
 @app.get("/sensor_data", response_model=list[Measurement])
 def read_sensor_data() -> list[Measurement]:
@@ -69,6 +83,8 @@ def create_csv():
     with open(csv_filename, mode='w', newline='') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["Latitude", "Longitude", "Value"])
+
+
 
 if __name__ == '__main__':
     create_csv()
