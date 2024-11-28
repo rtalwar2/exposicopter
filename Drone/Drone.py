@@ -5,12 +5,12 @@ import random
 import math
 
 class Drone:
-    def __init__(self, connection_string):
+    def __init__(self, connection_string, source_system,source_component):
         # Establish connection to the drone using pymavlink
         print(f"Connecting to vehicle on: {connection_string}")
         self.connection = mavutil.mavlink_connection(connection_string,
-                                        source_system=1,
-                                        source_component=2)
+                                        source_system,
+                                        source_component)
         self.connection.wait_heartbeat()
         print("Heartbeat received. Drone is ready.")
 
@@ -264,8 +264,16 @@ class Drone:
         print(f"Sending random data: {value}")
         self.connection.mav.statustext_send(
             mavutil.mavlink.MAV_SEVERITY_INFO,
-            f"{{\"lat\":{lat}, \"lon\":{lon}, \"RF_Value\":{value}}}".encode('utf-8'),0,0
+            f"{{\"lat\":{lat}, \"lon\":{lon}, \"V\":{value}}}".encode('utf-8'),0,0
         )
+
+    def send_message(self,message):
+        print(f"Sending message: {message}")
+        self.connection.mav.statustext_send(
+            mavutil.mavlink.MAV_SEVERITY_INFO,
+            message.encode('utf-8'),0,0
+        )
+
     def return_home(self):
         print("-- Returning home")
         self.connection.mav.command_long_send(

@@ -6,6 +6,7 @@ map.options.maxZoom = 50;  // Allow zooming up to level 22
 let data_shown=false;
 let heatmapLayer;
 let existingData = [];
+let check_connection_interval;
 
 function init_map(){
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -49,23 +50,19 @@ function onFileChange(event){
     }
 }
 
-
 function postLocationforInspection(point){
     const url = "http://127.0.0.1:8000/inspect"
     fetch(url, {
         method: 'POST',
-        body : point
+        headers: {
+            'Content-Type': 'application/json', // Ensure JSON content type
+        },
+        body : JSON.stringify(point)
     })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log("this is the data", data);
-            showPlotlyData(data);
-            showMapData(data);
         })
         .catch(error => {
             // Handle error
@@ -74,6 +71,7 @@ function postLocationforInspection(point){
 }
 
 function showPlotlyData(data){
+    console.log(data_shown)
     Plotly.newPlot('heatmap', [{
         x: data.map(d => d.lon),
         y: data.map(d => d.lat),
@@ -102,13 +100,40 @@ function showPlotlyData(data){
             zeroline: false,
         }
     });
-    if(!data_shown){
         document.querySelector("#heatmap").on('plotly_click', function(data){
             const pt = data.points[0]
             console.log(pt.x ,pt.y )
             postLocationforInspection({"lat": pt.y,"lon": pt.x})
         });
+    
+}
+
+function addPlotlyData(newData) {
+    // Extract the heatmap plot element
+    const plotElement = document.querySelector("#heatmap");
+
+    // Use Plotly.extendTraces to add new data to the scatter plot
+    Plotly.extendTraces(plotElement, {
+        x: [[newData.lon]],  // Append new longitude
+        y: [[newData.lat]],  // Append new latitude
+        'marker.color': [[newData.value]], // Append new color value (nested array for matching indices)
+        text: [[`Value: ${newData.value}`]] // Append the tooltip for the new point
+    }, [0]); // Assuming trace index is 0
+}
+
+function addMapData(data){
+    if (!data_shown){
+        const firstDataPoint = data;
+        map.flyTo([firstDataPoint.lat, firstDataPoint.lon], 19, {
+            animate: true,          // Enable animation
+            duration: 2              // Duration of flyTo animation in seconds
+        });
+        data_shown=true;
     }
+    const point = data
+    // Add each new data point individually to the heatmap layer
+    heatmapLayer.addLatLng([point.lat, point.lon, point.value]);
+    existingData.push(point);  // Add to the existing data tracker
 }
 
 function showMapData(data){
@@ -135,19 +160,87 @@ function showMapData(data){
 
 }
 
-
+function loadData(){
+    console.log("loading data")
+    const url = "http://127.0.0.1:8000/sensor_data"
+    fetch(url, {
+        method: 'GET'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("this is the data", data);
+            showPlotlyData(data);
+            showMapData(data);
+        })
+        .catch(error => {
+            // Handle error
+            console.error('There was a problem with the retrieval of the data:', error);
+        });
+}
 
 function selectFile(){
     document.querySelector("#fileSelector").click()
 }
 
+function check_connection(){
+    const url = "http://127.0.0.1:8000/connection_status"
+    fetch(url, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("this is the data", data);
+        if(data.drone_connected){
+            clearInterval(check_connection_interval);
+            // document.querySelector("#js_alert").style.display='none'
+            document.querySelector("#js_alert").classList.remove('alert-warning')
+            document.querySelector("#js_alert").classList.add('alert-success')
+            document.querySelector("#js_alert").innerText="Drone connected!"
+            loadData();
+        }
+    })
+    .catch(error => {
+        // Handle error
+        console.error('There was a problem with the retrieval of the data:', error);
+    });
+}
+
+// Connect to WebSocket
+const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+ws.onopen = () => {
+    console.log("Connected to WebSocket");
+};
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log("New measurement received:", data);
+
+    // Update UI with the new measurement
+    addPlotlyData(data);
+    addMapData(data);
+};
+
+ws.onclose = () => {
+    console.log("WebSocket connection closed");
+};
+
+
 function main() {
     init_map();
-    // setInterval(()=>{setTimeout(loadData,1)}, 2000);
-    // console.log(kaas)
+    check_connection_interval= setInterval(check_connection,2000);
     document.querySelector("#fileSelectorBtn").addEventListener("click",selectFile)
     document.querySelector("#fileSelector").addEventListener("change",onFileChange)
-
 }
 
 main()
