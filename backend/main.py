@@ -39,10 +39,6 @@ csv_filename = f"measurements_{current_time}.csv"
 drone=None
 drone_connected = False  # Indicates if the drone is connected
 
-
-
-
-
 # Function to notify all connected clients
 async def notify_clients(data):
     global connections
@@ -54,12 +50,15 @@ async def notify_clients(data):
 
 
 # Function to listen to MAVLink messages and update the measurements list
+# executed in a separate thread
 def listen_for_mavlink():
     global measurements
     global drone
     global drone_connected
-    print("waiting for heartbeat, please proxy server")
-    connection_string = "udp:192.168.0.124:14550"
+    print("waiting for heartbeat, please start proxy server")
+    # connection_string = "udp:192.168.0.126:14550"
+    connection_string = "udp:172.31.48.1:14550"
+    # connection_string = "udp:10.10.130.121:14550"
     drone = Drone(connection_string,source_system=1,source_component=3)
     print("Listening for MAVLink messages...")
     drone_connected=True
@@ -133,6 +132,5 @@ if __name__ == '__main__':
     create_csv()
     # Start the MAVLink listener in a separate thread
     thread = threading.Thread(target=listen_for_mavlink, daemon=True)
-    thread2 = threading.Thread(target=listen_for_mavlink, daemon=True)
     thread.start()
     uvicorn.run(app, host="0.0.0.0", port=8000)

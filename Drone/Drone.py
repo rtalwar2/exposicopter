@@ -5,10 +5,10 @@ import random
 import math
 
 class Drone:
-    def __init__(self, connection_string, source_system,source_component):
+    def __init__(self, connection_string, source_system,source_component, baudrate=115200):
         # Establish connection to the drone using pymavlink
         print(f"Connecting to vehicle on: {connection_string}")
-        self.connection = mavutil.mavlink_connection(connection_string,
+        self.connection = mavutil.mavlink_connection(connection_string,baud=baudrate
                                         source_system,
                                         source_component)
         self.connection.wait_heartbeat()

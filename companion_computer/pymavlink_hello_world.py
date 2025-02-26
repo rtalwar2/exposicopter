@@ -11,8 +11,7 @@ from Drone.Drone import Drone
 # Connect to the vehicle via serial or UDP (adjust as needed)
 # connection_string = 'tcp:172.17.240.253:5762'  # Adjust for your setup
 # connection_string = 'tcp:192.168.0.124:5762'  # local ip address windows when SITL MP
-# connection_string = "udp:127.0.0.1:14560" #when WSL
-connection_string = "tcp:127.0.0.1:5762"
+connection_string = "tcp:127.0.0.1:5762" #when wsl
 drone = Drone(connection_string,source_system=1,source_component=2)
 
 waypoints = drone.download_mission()
@@ -68,6 +67,7 @@ while True:
                     current_lat = msg.lat / 1e7
                     current_lon = msg.lon / 1e7
                     drone.send_measurement_data(current_lat,current_lon,1.5,5)
+                    time.sleep(5)
                 for i in range(2):
                     drone.fly_to_location_ned_blocking(0,0.5)#right
                     time.sleep(5)
