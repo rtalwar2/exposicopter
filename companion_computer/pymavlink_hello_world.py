@@ -69,6 +69,7 @@ while True:
                     current_lat = msg.lat / 1e7
                     current_lon = msg.lon / 1e7
                     drone.send_measurement_data(current_lat,current_lon,1.5,5)
+                    time.sleep(5)
                 for i in range(2):
                     drone.fly_to_location_ned_blocking(0,0.5)#right
                     time.sleep(5)
