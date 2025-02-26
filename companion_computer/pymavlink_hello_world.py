@@ -12,7 +12,8 @@ from Drone.Drone import Drone
 # connection_string = 'tcp:172.17.240.253:5762'  # Adjust for your setup
 # connection_string = 'tcp:192.168.0.124:5762'  # local ip address windows when SITL MP
 # connection_string = "udp:127.0.0.1:14560" #when WSL
-connection_string = "tcp:127.0.0.1:5762"
+# connection_string = "tcp:127.0.0.1:5762"
+connection_string = "/dev/serial0"
 drone = Drone(connection_string,source_system=1,source_component=2)
 
 waypoints = drone.download_mission()
