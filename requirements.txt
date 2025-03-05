@@ -1,2 +1,4 @@
 pymavlink
 pyserial
+pandas
+matplotlib

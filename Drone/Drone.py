@@ -8,9 +8,9 @@ class Drone:
     def __init__(self, connection_string, source_system,source_component, baudrate=115200):
         # Establish connection to the drone using pymavlink
         print(f"Connecting to vehicle on: {connection_string}")
-        self.connection = mavutil.mavlink_connection(connection_string,baud=baudrate
-                                        source_system,
-                                        source_component)
+        self.connection = mavutil.mavlink_connection(device=connection_string,baud=baudrate,
+                                        source_system=source_system,
+                                        source_component=source_component)
         self.connection.wait_heartbeat()
         print("Heartbeat received. Drone is ready.")
 
@@ -124,16 +124,18 @@ class Drone:
 
     def arm(self):
         print("-- Arming motors")
-        self.connection.mav.command_long_send(
-            self.connection.target_system,
-            self.connection.target_component,
-            mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-            0,
-            1, 0, 0, 0, 0, 0, 0  # Arm the system
-        )
+        self.connection.arducopter_arm()
+
+        # self.connection.mav.command_long_send(
+        #     self.connection.target_system,
+        #     self.connection.target_component,
+        #     mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+        #     0,
+        #     1, 0, 0, 0, 0, 0, 0  # Arm the system
+        # )
         self.connection.motors_armed_wait()
         print("Drone armed")
-    
+
     def takeoff(self,target_altitude=2): 
         # drone should be armed and in guided mode for this to work!
         print("-- Taking off")
@@ -297,4 +299,34 @@ class Drone:
 
     def sleep(self):
         print("Closing connection")
+        self.connection.arducopter_disarm()
         self.connection.close()
+
+    def test_motor_spin_individual(self, motor_index, throttle_rpm, duration_seconds):
+
+        print(f"Spinning motor {motor_index} at {throttle_rpm} RPM for {duration_seconds} seconds.")
+        self.connection.mav.command_long_send(
+            self.connection.target_system,
+            self.connection.target_component,
+            mavutil.mavlink.MAV_CMD_DO_MOTOR_TEST,  
+            0,  # Confirmation
+            motor_index,  # Motor index (0-based)
+            1,  # Motor test throttle type (1 = RPM control, see ArduPilot docs)
+            throttle_rpm,  # Desired throttle/RPM
+            duration_seconds,  # Duration in seconds
+            1, # Motor Count
+            0, # Test order
+            0  # Unused parameter
+        )
+    
+    def test_motor_spin_all(self,throttle_rpm,duration_seconds=60):
+        # Spin motors sequentially
+        for motor_index in range(1, 5):
+            self.test_motor_spin_individual(motor_index, throttle_rpm, duration_seconds)
+            time.sleep(0.01)
+        
+    def test_motor_spin_all_increasing(self,min,max,step_duration,total_duration):
+
+        for i in range(min,max,(max-min)//total_duration):
+            self.test_motor_spin_all(i,step_duration+5)
+            time.sleep(step_duration)
