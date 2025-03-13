@@ -4,19 +4,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Define the folder where CSV files are stored
-csv_folder = "."  # Change this if needed
+csv_folder = "processed-data"  # Change this if needed
 
 # Find all CSV files in the folder
 csv_files = glob.glob(os.path.join(csv_folder, "*.csv"))
 
-# Function to convert voltage to dBm
-def voltage_to_dbm(voltage):
-    if voltage > 2:
-        return (2.0 / -0.025) + 20.0  # -60 dB
-    elif voltage < 0.5:
-        return (0.5 / -0.025) + 20.0  # 0 dB
-    else:
-        return (voltage / -0.025) + 20.0
+# # Function to convert voltage to dBm
+# def voltage_to_dbm(voltage):
+#     if voltage > 2:
+#         return (2.0 / -0.025) + 20.0  # -60 dB
+#     elif voltage < 0.5:
+#         return (0.5 / -0.025) + 20.0  # 0 dB
+#     else:
+#         return (voltage / -0.025) + 20.0
 
 # Dictionary to store processed data
 data_dict = {}
@@ -34,18 +34,18 @@ for file in csv_files:
         df = pd.read_csv(file)
 
         # Ensure correct column names exist
-        required_columns = {"Timestamp", "Average", "Min", "Max", "Median"}
+        required_columns = {"Second", "Average", "Min", "Max", "Median"}
         if required_columns.issubset(df.columns):
             # Apply the mapping function to the numeric columns
-            df["Average"] = df["Average"].apply(voltage_to_dbm)
-            df["Min"] = df["Min"].apply(voltage_to_dbm)
-            df["Max"] = df["Max"].apply(voltage_to_dbm)
-            df["Median"] = df["Median"].apply(voltage_to_dbm)
+            # df["Average"] = df["Average"].apply(voltage_to_dbm)
+            # df["Min"] = df["Min"].apply(voltage_to_dbm)
+            # df["Max"] = df["Max"].apply(voltage_to_dbm)
+            # df["Median"] = df["Median"].apply(voltage_to_dbm)
 
             # Store processed data
             data_dict[custom_param] = df
 
-            # Compute the average of the "Average" column and store it
+            # Compute the average of the "Median" column and store it
             average_dbm_per_file[custom_param] = df["Average"].mean()
 
         else:
@@ -77,7 +77,7 @@ axes[1, 0].set_title("Max (dBm)")
 axes[1, 1].set_title("Median (dBm)")
 
 for ax in axes[:2, :].flat:  # Apply to the first 4 subplots
-    ax.set_xlabel("Timestamp")
+    ax.set_xlabel("Elapsed time (s)")
     ax.set_ylabel("dBm")
     ax.legend()
 
