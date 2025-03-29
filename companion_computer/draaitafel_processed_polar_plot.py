@@ -33,7 +33,9 @@ for file in csv_files:
         freq_dbm = parts[-1].replace(".csv", "")  # e.g., "600mhz-15dbm"
         
         try:
-            frequency, source_dbm = freq_dbm.split("-")  # e.g., "600mhz", "15dbm"
+            d = freq_dbm.split("-")  # e.g., "600mhz", "15dbm"
+            frequency = d[-2]
+            source_dbm=d[-1]
         except ValueError:
             print(f"Skipping {file}: Unable to extract frequency and dBm from {freq_dbm}")
             continue
@@ -48,9 +50,9 @@ for file in csv_files:
             df["Angle (°)"] = df["Second"] * 2  # 1 second = 2 degrees
             
             df_forward=df[df["Second"]<=180]
-            df_backward=df[df["Second"]>180]
+            df_backward=df[df["Second"]>181]
 
-            df_backward["Angle (°)"]=720-df_backward["Angle (°)"]
+            df_backward["Angle (°)"]=720-df_backward["Angle (°)"]-2#compensate for missing second
 
             df_forward["Angle (rad)"] = np.radians(df_forward["Angle (°)"])  # Convert degrees to radians
             df_backward["Angle (rad)"] = np.radians(df_backward["Angle (°)"])  # Convert degrees to radians
@@ -90,7 +92,7 @@ for frequency, dbm_data in data_dict.items():
 
             # Plot Median dBm
             axes[1].plot(df["Angle (rad)"], df["Median"], label=f"{source_dbm} {direction}", linewidth=1.5)
-        break
+        # break
 
     # Format the polar plots
     for ax, title in zip(axes, ["Average dBm", "Median dBm"]):

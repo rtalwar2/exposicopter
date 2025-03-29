@@ -18,23 +18,24 @@ os.makedirs(raw_data_folder, exist_ok=True)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the Drone class from Drone/Drone.py
-from Drone.Drone import Drone
+# from Drone.Drone import Drone
 
 # Setup drone connection
 # connection_string = "/dev/serial0"
 # drone = Drone(connection_string, source_system=1, source_component=2, baudrate=57600)
 
 # Setup serial connection to Adafruit Feather
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+# ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+ser = serial.Serial('COM14', 9600, timeout=1)
 
 # Generate CSV filename using current datetime + custom parameter
-custom_param = "test-draaitafel-max-773mhz-16.9dbm-0.78Vm" + "-raw"
+custom_param = "antenna-00-15dbm-942.5hz" + "-raw"
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 # Generate CSV filename with the correct folder path
 csv_filename = os.path.join(raw_data_folder, f"{timestamp}_{custom_param}.csv")
 
-test_duration = 30  # 2 minutes
+test_duration = 2*60  # 2 minutes
 
 # Function to run motor spin in a separate thread
 def run_motor_spin():
