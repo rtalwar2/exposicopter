@@ -29,13 +29,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 ser = serial.Serial('COM14', 9600, timeout=1)
 
 # Generate CSV filename using current datetime + custom parameter
-custom_param = "antenna-00-15dbm-942.5hz" + "-raw"
+custom_param = "telem-oneside-after-MP-3m-90-antenna--90-0dbm-942.5hz" + "-raw"
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 # Generate CSV filename with the correct folder path
 csv_filename = os.path.join(raw_data_folder, f"{timestamp}_{custom_param}.csv")
 
-test_duration = 2*60  # 2 minutes
+test_duration = 30  # 2 minutes
 
 # Function to run motor spin in a separate thread
 def run_motor_spin():
