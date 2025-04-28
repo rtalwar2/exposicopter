@@ -2,6 +2,8 @@ import sys
 import os
 import time
 import random
+import serial
+
 # Add the parent directory (where "Drone" resides) to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -10,16 +12,17 @@ from Drone.Drone import Drone
 
 # Connect to the vehicle via serial or UDP (adjust as needed)
 # connection_string = 'tcp:172.17.240.253:5762'  # Adjust for your setup
-# connection_string = 'tcp:192.168.0.124:5762'  # local ip address windows when SITL MP
+connection_string = 'tcp:127.0.0.1:5762'  # local ip address windows when SITL MP
 # connection_string = "udp:127.0.0.1:14560" #when WSL
 # connection_string = "tcp:127.0.0.1:5762"
-connection_string = "/dev/serial0"
+# ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+# connection_string = "/dev/serial0"
 drone = Drone(connection_string,source_system=1,source_component=2,baudrate=57600)
 
 waypoints = drone.download_mission()
 if not waypoints:
     print("No waypoints received!")
-    # exit()
+    exit()
 
 while drone.get_flight_mode()!=4:# see https://ardupilot.org/copter/docs/parameters.html#fltmode1 for flightmodes
     print("waiting for correct flightmode...")
@@ -29,21 +32,24 @@ while drone.get_flight_mode()!=4:# see https://ardupilot.org/copter/docs/paramet
 drone.arm()
 
 # now flightmode is set, takeoff
-# drone.takeoff(target_altitude=2)
+drone.takeoff(target_altitude=2)
 
-# # # set speed sometimes works sometimes doesn't todo, check!
-# drone.set_target_velocity(0.1)
+# # set speed sometimes works sometimes doesn't todo, check!
+drone.set_target_velocity(0.1)
 
-# # complete the mission
-# for waypoint in waypoints:
-#     # this is a blocking call and we continue after reaching this point
-#     drone.fly_to_location_blocking(*waypoint)
 
-#     print("-- Hovering at point, starting measurements")
-#     time.sleep(5)  # Simulate hover and time to take measurement
-#     # Send random data to the ground control station
-#     random_number = random.randint(1, 100)
-#     drone.send_measurement_data(*waypoint,random_number)
+
+# complete the mission
+for waypoint in waypoints:
+    # this is a blocking call and we continue after reaching this point
+    lat, lon, alt = waypoint
+    drone.fly_to_location_blocking(lat,lon,1.5) #to force the mission 
+
+    print("-- Hovering at point, starting measurements")
+    time.sleep(5)  # Simulate hover and time to take measurement
+    # Send random data to the ground control station
+    random_number = random.randint(1, 100)
+    drone.send_measurement_data(*waypoint,random_number)
 
 # print("mission finished, waiting for user")
 # # Continuously read MAVLink messages

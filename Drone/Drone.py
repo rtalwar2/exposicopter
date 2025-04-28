@@ -50,7 +50,7 @@ class Drone:
                 print(f"Failed to receive waypoint {seq}.")
                 break
 
-        return waypoints[2:] #first is home waypoint second is do speed so don't add to flight
+        return waypoints[1:] #first is home waypoint
         # Function to calculate the distance between two GPS coordinates
 
 
