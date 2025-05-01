@@ -50,7 +50,7 @@ class Drone:
                 print(f"Failed to receive waypoint {seq}.")
                 break
 
-        return waypoints[1:] #first is home waypoint
+        return waypoints[1:] #first is home waypoint don't add that
         # Function to calculate the distance between two GPS coordinates
 
 
@@ -211,7 +211,7 @@ class Drone:
         while True:
             # Check if the drone is within an acceptable range of the target (e.g., 10 centimeters)
             distance = self.get_distance_from_target(lat,lon,alt)
-            if distance < 10:
+            if distance < 5:
                 print("Reached target location")
                 break  
             time.sleep(1)
@@ -235,6 +235,20 @@ class Drone:
             0, 0     # Yaw, yaw rate (not used here)
         )
 
+    def convert_forward_right_to_ned(self,heading_deg, forward, right):
+        heading_rad = math.radians(heading_deg)
+
+        # Forward/right to North/East
+        north = forward * math.cos(heading_rad) + right * math.cos(heading_rad+math.pi/2)
+        east = forward * math.cos(heading_rad-math.pi/2) + right * math.cos(heading_rad)
+
+        print(f"Converted (forward={forward}m, right={right}m) to (north={north:.2f}m, east={east:.2f}m)")
+        return north, east
+
+    def fly_to_location_frd_blocking(self,starting_heading,forward,right):
+        north,east = self.convert_forward_right_to_ned(starting_heading,forward,right)
+        self.fly_to_location_ned_blocking(north,east)
+
     def fly_to_location_ned_blocking(self, north, east, down=0):
 
         self.fly_to_location_ned(north, east, down)
@@ -254,7 +268,7 @@ class Drone:
         while True:
             # Check if the drone is within an acceptable range of the target (e.g., 10 centimeters)
             distance = self.get_distance_from_target(target_lat,target_lon,1.5)
-            if distance < 10:
+            if distance < 5:
                 print("Reached target location")
                 break  
             time.sleep(1)
@@ -263,7 +277,7 @@ class Drone:
 
     # Function to send random data to the GCS
     def send_measurement_data(self,lat,lon,alt,value):
-        print(f"Sending random data: {value}")
+        print(f"Sending data: {value}")
         self.connection.mav.statustext_send(
             mavutil.mavlink.MAV_SEVERITY_INFO,
             f"{{\"lat\":{lat}, \"lon\":{lon}, \"V\":{value}}}".encode('utf-8'),0,0
@@ -295,6 +309,16 @@ class Drone:
                 print("Landed successfully")
                 break
             time.sleep(2)
+        
+    def get_heading(self):
+        msg = self.get_global_position()
+        if msg and hasattr(msg, 'hdg'):
+            heading = msg.hdg / 100.0  # heading in degrees (0-360°)
+            print(f"Current heading: {heading}°")
+            return heading
+        else:
+            print("Failed to get heading.")
+            return None
     
 
     def sleep(self):
@@ -330,3 +354,5 @@ class Drone:
         for i in range(min,max,(max-min)//total_duration):
             self.test_motor_spin_all(i,step_duration+5)
             time.sleep(step_duration)
+
+    

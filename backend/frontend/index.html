@@ -16,7 +16,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <script src="plotly_offline.js" charset="utf-8"></script>
 
     <script defer src="main.js"></script>
 </head>
@@ -56,6 +56,19 @@
             <p class="card-text"></p>
             <input type="file" id="fileSelector" name="myfile" style="display: none;">
             <a class="btn btn-primary" id="fileSelectorBtn">Choose File</a>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Relative measurements</h5>
+            <div class="mb-3">
+                <label for="forwardInput" class="form-label">Forward (m)</label>
+                <input type="number" class="form-control" id="forwardInput" placeholder="e.g. 5">
+            </div>
+            <div class="mb-3">
+                <label for="rightInput" class="form-label">Right (m)</label>
+                <input type="number" class="form-control" id="rightInput" placeholder="e.g. 3">
+            </div>
+    
+            <a class="btn btn-primary" id="submitGridBtn">Fly Now</a>
         </div>
     </div>
     <div class="container">

@@ -4,6 +4,8 @@ import time
 import random
 import serial
 
+from helper_functions import read_and_send_data
+
 # Add the parent directory (where "Drone" resides) to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -39,17 +41,62 @@ drone.set_target_velocity(0.1)
 
 
 
-# complete the mission
-for waypoint in waypoints:
-    # this is a blocking call and we continue after reaching this point
-    lat, lon, alt = waypoint
-    drone.fly_to_location_blocking(lat,lon,1.5) #to force the mission 
+## complete the mission
+# for waypoint in waypoints:
+#     # this is a blocking call and we continue after reaching this point
+#     lat, lon, alt = waypoint
+#     drone.fly_to_location_blocking(lat,lon,1.5) #to force the mission 
 
-    print("-- Hovering at point, starting measurements")
-    time.sleep(5)  # Simulate hover and time to take measurement
-    # Send random data to the ground control station
-    random_number = random.randint(1, 100)
-    drone.send_measurement_data(*waypoint,random_number)
+#     print("-- Hovering at point, starting measurements")
+#     time.sleep(5)  # Simulate hover and time to take measurement
+#     # Send random data to the ground control station
+#     random_number = random.randint(1, 100)
+#     drone.send_measurement_data(*waypoint,random_number)
+
+heading = drone.get_heading()
+print(heading)
+
+# complete the mission
+forward=None
+right=None
+
+while forward==None and right==None:
+    time.sleep(5)
+    msg = drone.connection.recv_match(type="STATUSTEXT",blocking=True)
+    if msg.get_srcSystem()==3:
+        if msg.get_type() == "STATUSTEXT":
+            text = msg.to_dict()["text"]
+            print(text)
+            if "forward" in text:
+                forward = text[text.find(":")+1:text.find(" ")]
+                right = text[text.find(" ")+7:]
+
+print(forward,right)
+
+# build local horizontal grid
+for f in range(0,forward+1):
+    msg = drone.get_global_position()
+    if msg:
+        current_lat = msg.lat / 1e7
+        current_lon = msg.lon / 1e7
+        current_alt = msg.relative_alt / 1000.0  # Convert mm to meters
+        drone.send_measurement_data(current_lat,current_lon,1.5,5)
+    for r in range(0,right):
+        if (f+1)%2:
+            drone.fly_to_location_frd_blocking(heading,forward=0,right=1)
+        else:
+            drone.fly_to_location_frd_blocking(heading,forward=0,right=-1)
+        msg = drone.get_global_target_position()
+        if msg:
+            target_lat = msg.lat_int / 1e7
+            target_lon = msg.lon_int / 1e7
+            target_alt = msg.alt / 1000.0  # Convert mm to meters
+            # read_and_send_data(drone,broadband_probe,target_lat,target_lon)
+            drone.send_measurement_data(target_lat,target_lon,1.5,5)
+
+    drone.fly_to_location_frd_blocking(heading,forward=1,right=0)
+
+
 
 # print("mission finished, waiting for user")
 # # Continuously read MAVLink messages

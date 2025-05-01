@@ -18,16 +18,22 @@ from Drone.Drone import Drone
 
 app = FastAPI()
 
+# location data model
+class Location(BaseModel):
+    lat: float
+    lon: float
+
 # Measurement data model
 class Measurement(BaseModel):
     lat: float
     lon: float
     value: float
 
-# location data model
-class Location(BaseModel):
-    lat: float
-    lon: float
+
+# Grid data model
+class Grid(BaseModel):
+    forward: float
+    right: float
 
 # Global variable to store the latest measurements
 measurements = []
@@ -56,9 +62,8 @@ def listen_for_mavlink():
     global drone
     global drone_connected
     print("waiting for heartbeat, please start proxy server")
-    # connection_string = "udp:192.168.0.126:14550"
-    connection_string = "udp:172.31.48.1:14550"
-    # connection_string = "udp:10.10.130.121:14550"
+    # connection_string = "udp:172.31.48.1:14560" #ip adress of local wsl instance, is fixed
+    connection_string = 'tcp:127.0.0.1:5763' #ip adress of local wsl instance, is fixed
     drone = Drone(connection_string,source_system=1,source_component=3)
     print("Listening for MAVLink messages...")
     drone_connected=True
@@ -68,11 +73,12 @@ def listen_for_mavlink():
             text_data = msg.to_dict()["text"]
             print(text_data)
             # Check if the text data matches the expected format
-            if "V" in text_data:
+            if msg.get_srcComponent()==2 and "V" in text_data:
+            # if "V" in text_data:
                 try:
                     print(text_data)
                     json_data = json.loads(text_data)
-                    # print(json_data.keys())
+                    print(json_data.keys())
                     # Add the new measurement to the list
                     measurement = Measurement(lat=json_data['lat'], lon=json_data["lon"], value=json_data["V"])
                     measurements.append(measurement)
@@ -91,8 +97,11 @@ def listen_for_mavlink():
 
 @app.post("/inspect")
 def inspect_location(loc:Location):
-    print(loc)
     drone.send_message(f"lat:{loc.lat} lon:{loc.lon}")
+
+@app.post("/grid")
+def send_grid(gr:Grid):
+    drone.send_message(f"fw:{gr.forward} rt:{gr.right}")
 
 @app.get("/sensor_data", response_model=list[Measurement])
 def read_sensor_data() -> list[Measurement]:
@@ -117,7 +126,7 @@ async def websocket_endpoint(websocket: WebSocket):
         connections.remove(websocket)
 
 
-app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
+app.mount("/", StaticFiles(directory="backend\\frontend", html=True), name="static")
 
 
 def create_csv():
