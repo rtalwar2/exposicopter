@@ -53,7 +53,7 @@ def filter_burst_and_give_mean(broadband_probe,data_dict):
     end_time = None
     # Parameters for Burst Identification
     initial_threshold_dbm = -40.0 # Amplitude threshold to identify POTENTIAL burst points
-    max_intra_burst_gap = 0.01  # Max time gap WITHIN a single burst (tune based on sampling rate)
+    max_intra_burst_gap = 0.01 # Max time gap WITHIN a single burst (tune based on sampling rate)
 
     # Parameters for Filtering Identified Bursts by Duration
     # *** Use values based on your "Histogram of Burst Durations" ***
@@ -173,12 +173,11 @@ def filter_burst_and_give_mean(broadband_probe,data_dict):
 
                 # --- Outlier Detection ---
                 # Example: Define outliers as points > 2 standard deviations from mean
-                mean_dbm = burst_points.mean()
-                std_dbm = burst_points.std()
+                median_dbm = burst_points.median()
 
-                threshold = 2.0  
-                lower_bound = mean_dbm - threshold * std_dbm
-                upper_bound = mean_dbm + threshold * std_dbm
+                threshold = 1  
+                lower_bound = median_dbm - threshold
+                upper_bound = median_dbm + threshold
 
                 # Identify good points (NOT outliers)
                 good_points_mask = (burst_points >= lower_bound) & (burst_points <= upper_bound)
@@ -209,7 +208,7 @@ def filter_burst_and_give_mean(broadband_probe,data_dict):
 def read_raw_probe_and_burst_analysis(broadband_probe,lat,lon):
     print(f"starting measurements at {lat} {lon}")
     # Define the folder where CSV files should be saved
-    raw_data_folder = "raw-flight-data"
+    raw_data_folder = "/home/exposicopter/thesis/raman/exposicopter/raw-flight-data" #absolute path needed for rc.local
 
     # Ensure the folder exists
     os.makedirs(raw_data_folder, exist_ok=True)

@@ -2,3 +2,4 @@ pymavlink
 pyserial
 pandas
 matplotlib
+numpy

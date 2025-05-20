@@ -29,7 +29,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 ser = serial.Serial('COM14', 9600, timeout=1)
 
 # Generate CSV filename using current datetime + custom parameter
-custom_param = "rc-7m" + "-raw"
+custom_param ="bs-with-rc-with-telem-no-phone2" + "-raw"
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 # Generate CSV filename with the correct folder path

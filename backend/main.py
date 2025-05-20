@@ -29,19 +29,15 @@ class Measurement(BaseModel):
     lon: float
     value: float
 
-
 # Grid data model
 class Grid(BaseModel):
-    forward: float
-    right: float
+    forward: int
+    right: int
 
 # Global variable to store the latest measurements
 measurements = []
 connections = []  # To store active WebSocket connections
 
-# Create a CSV file with the current date and time
-current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-csv_filename = f"measurements_{current_time}.csv"
 drone=None
 drone_connected = False  # Indicates if the drone is connected
 
@@ -62,9 +58,9 @@ def listen_for_mavlink():
     global drone
     global drone_connected
     print("waiting for heartbeat, please start proxy server")
-    # connection_string = "udp:172.31.48.1:14560" #ip adress of local wsl instance, is fixed
-    connection_string = 'tcp:127.0.0.1:5763' #ip adress of local wsl instance, is fixed
-    drone = Drone(connection_string,source_system=1,source_component=3)
+    connection_string = "udp:172.31.48.1:14560" #ip adress of local wsl instance, is fixed
+    # connection_string = 'tcp:127.0.0.1:5763' #ip adress of local wsl instance, is fixed
+    drone = Drone(connection_string,source_system=2,source_component=1)
     print("Listening for MAVLink messages...")
     drone_connected=True
     while True:
@@ -82,11 +78,6 @@ def listen_for_mavlink():
                     # Add the new measurement to the list
                     measurement = Measurement(lat=json_data['lat'], lon=json_data["lon"], value=json_data["V"])
                     measurements.append(measurement)
-
-                    # write to csv
-                    with open(csv_filename, mode='a', newline='') as csv_file:
-                        writer = csv.writer(csv_file)
-                        writer.writerow([json_data['lat'], json_data["lon"], json_data["V"]])
 
                     # Notify connected WebSocket clients
                     asyncio.run(notify_clients(measurement.dict()))
@@ -113,6 +104,18 @@ def connection_status():
     global drone_connected
     return {"drone_connected": drone_connected}
 
+@app.post("/finish")
+def finish_measurements():
+    finished_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    finished_filename = f"finished_measurements_{finished_time}.csv"
+    with open(finished_filename, mode='w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["Latitude", "Longitude", "Value"])
+        for m in measurements:
+            writer.writerow([m.lat, m.lon, m.value])
+
+    measurements.clear()  # Clear the list after writing to file
+    return {"status": "success", "file": finished_filename}
 
 # WebSocket endpoint
 @app.websocket("/ws")
@@ -128,17 +131,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 app.mount("/", StaticFiles(directory="backend\\frontend", html=True), name="static")
 
-
-def create_csv():
-    # Initialize the CSV file with headers
-    with open(csv_filename, mode='w', newline='') as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerow(["Latitude", "Longitude", "Value"])
-
-
-
 if __name__ == '__main__':
-    create_csv()
     # Start the MAVLink listener in a separate thread
     thread = threading.Thread(target=listen_for_mavlink, daemon=True)
     thread.start()

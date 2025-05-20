@@ -83,36 +83,47 @@ function showPlotlyData(data){
     Plotly.newPlot('heatmap', [{
         x: data.map(d => d.lon),
         y: data.map(d => d.lat),
-        mode: 'markers',
+        mode: 'markers+text',
         type: 'scatter',
         marker: {
             color: data.map(d => d.value),  // Color points based on their value
             colorscale: 'Jet',              // Use a color scale for heatmap effect
-            showscale: true                 // Show the color scale legend
+            showscale: true,                 // Show the color scale legend
+            colorbar: {
+                title: {text:'Power level (dBm)',side:"right"},
+            },
+            size:12
         },
-        text: data.map(d => `Value: ${d.value}`)
+        // text: data.map(d => `Value: ${d.value}`)
+        text: data.map(d => d.value.toFixed(1)),  // Show value as text, rounded to 1 decimal
+        textposition: 'top center',               // Position text above marker
+        textfont: {
+            size: 12,
+            color: 'black'                        // Choose a text color that contrasts well
+        }
     }], {
-        title: 'Heatmap of Measurements',
+        title: {text:'Heatmap of Measurements'},
         xaxis: {
             scaleanchor: 'y',    // Lock aspect ratio to y-axis
             scaleratio: 1,        // Ensure 1:1 ratio with the y-axis
             showline: false,
             showgrid: false,
             zeroline: false,
+            title:{text:"longitude"}
         },
         yaxis: {
-            scaleanchor: 'x',    // Lock aspect ratio to x-axis
             scaleratio: 1,        // Ensure 1:1 ratio with the x-axis
             showline: false,
             showgrid: false,
             zeroline: false,
+            title:{text:"latitude"}
         }
     });
-        document.querySelector("#heatmap").on('plotly_click', function(data){
-            const pt = data.points[0]
-            console.log(pt.x ,pt.y )
-            postLocationforInspection({"lat": pt.y,"lon": pt.x})
-        });
+    document.querySelector("#heatmap").on('plotly_click', function(data){
+        const pt = data.points[0]
+        console.log(pt.x ,pt.y )
+        postLocationforInspection({"lat": pt.y,"lon": pt.x})
+    });
     
 }
 
@@ -208,7 +219,7 @@ function check_connection(){
         return response.json();
     })
     .then(data => {
-        console.log("this is the check connection data ", data);
+        console.log("this is the drone state ", data);
         if(data.drone_connected){
             clearInterval(check_connection_interval);
             // document.querySelector("#js_alert").style.display='none'
@@ -268,6 +279,27 @@ function sendGridLocations(){
             console.error('There was a problem with the retrieval of the data:', error);
         });
     }
+function finishMeasurements(){
+    const url = "http://127.0.0.1:8000/finish"
+    fetch(url, {
+        method: 'POST',
+    }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+    }).then(data => {
+        if (data.status === 'success') {
+            alert(`Measurements saved to ${data.file}`);
+        } else {
+            alert('Failed to finish measurements');
+        }
+    }).catch(error => {
+        // Handle error
+        console.error('There was a problem with the retrieval of the data:', error);
+    });
+};
+
 
 function main() {
     init_heat_map();
@@ -275,6 +307,22 @@ function main() {
     document.querySelector("#fileSelectorBtn").addEventListener("click",selectFile)
     document.querySelector("#fileSelector").addEventListener("change",onFileChange)
     document.querySelector("#submitGridBtn").addEventListener("click",sendGridLocations)
-}
+    document.querySelector('#finishMeasurementsBtn').addEventListener('click',finishMeasurements)
+    
+    // for mode
+    document.getElementById('liveFlight').checked = true;
+    liveCard.style.display = 'block';
+    historicCard.style.display = 'none';
+    document.querySelectorAll('input[name="flightMode"]').forEach((radio) => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'live') {
+                liveCard.style.display = 'block';
+                historicCard.style.display = 'none';
+            } else {
+                liveCard.style.display = 'none';
+                historicCard.style.display = 'block';
+            }
+        });
+    });}
 
 main()

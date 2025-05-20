@@ -51,7 +51,6 @@ class Drone:
                 break
 
         return waypoints[1:] #first is home waypoint don't add that
-        # Function to calculate the distance between two GPS coordinates
 
 
     # Function to request GLOBAL_POSITION_INT message
@@ -355,4 +354,31 @@ class Drone:
             self.test_motor_spin_all(i,step_duration+5)
             time.sleep(step_duration)
 
-    
+
+    def request_distance_sensor(self):
+        print("Requesting DISTANCE_SENSOR message...")
+        self.connection.mav.command_long_send(
+            self.connection.target_system,
+            self.connection.target_component,
+            mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,
+            0,         # Confirmation
+            132,       # Message ID for DISTANCE_SENSOR
+            0, 0, 0, 0, 0, 0
+        )
+
+    def get_sonar_range(self):
+        """
+        Retrieves the current sonar/rangefinder distance from the drone (in meters).
+        """
+        print("Requesting sonar range (DISTANCE_SENSOR)...")
+        
+        self.request_distance_sensor()
+
+        msg = self.connection.recv_match(type='DISTANCE_SENSOR', blocking=True)
+        if msg:
+            distance_m = msg.current_distance / 100.0  # Convert from cm to meters
+            print(f"Sonar range: {distance_m:.2f} meters")
+            return distance_m
+        else:
+            print("No DISTANCE_SENSOR message received.")
+            return None

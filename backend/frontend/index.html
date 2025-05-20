@@ -18,6 +18,7 @@
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script src="plotly_offline.js" charset="utf-8"></script>
 
+
     <script defer src="main.js"></script>
 </head>
 
@@ -50,15 +51,29 @@
     <div class="alert alert-warning" id="js_alert" role="alert">
         Drone not connected!
       </div>
-    <div class="card floating-card">
+      <div class="card floating-card">
         <div class="card-body">
+            <h5 class="card-title">Select Mode</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flightMode" id="liveFlight" value="live" checked>
+                <label class="form-check-label" for="liveFlight">Live Flight</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flightMode" id="historicFlight" value="historic">
+                <label class="form-check-label" for="historicFlight">Historic Flight</label>
+            </div>
+        </div>
+    
+        <!-- Historic Flight: File Upload -->
+        <div class="card-body" id="historicCard">
             <h5 class="card-title">Import measurements</h5>
-            <p class="card-text"></p>
             <input type="file" id="fileSelector" name="myfile" style="display: none;">
             <a class="btn btn-primary" id="fileSelectorBtn">Choose File</a>
         </div>
-        <div class="card-body">
-            <h5 class="card-title">Relative measurements</h5>
+    
+        <!-- Live Flight: Grid Input -->
+        <div class="card-body" id="liveCard">
+            <h5 class="card-title">Live measurements</h5>
             <div class="mb-3">
                 <label for="forwardInput" class="form-label">Forward (m)</label>
                 <input type="number" class="form-control" id="forwardInput" placeholder="e.g. 5">
@@ -68,9 +83,10 @@
                 <input type="number" class="form-control" id="rightInput" placeholder="e.g. 3">
             </div>
     
-            <a class="btn btn-primary" id="submitGridBtn">Fly Now</a>
+            <a class="btn btn-primary mb-2" id="submitGridBtn">Send Grid</a>
+            <a class="btn btn-success mb-2" id="finishMeasurementsBtn">Finish</a>
         </div>
-    </div>
+    </div>    
     <div class="container">
         <div class="row">
             <div class="col-md-6" style="height: 80vh;" id="map"></div>
@@ -102,7 +118,7 @@
                 <div class="col">
                     <ul class="list-inline my-2">
                         <li class="list-inline-item"><a class="link-secondary"
-                                href="https://www.linkedin.com/in/raman-talwar/">Raman Talwar</a></li>
+                                href="#">Raman Talwar</a></li>
                     </ul>
                 </div>
             </div>
