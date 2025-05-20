@@ -116,7 +116,7 @@ Then, start the backend manually:
 ## 🙏 Acknowledgements
 
 - Supervision: Kenneth, Jeroen, Lowie, and Han — thank you for the technical support and guidance.
-- Sparring partner: Jonas — your feedback and energy pushed this project to a higher level.
+- Sparring partner: Jonas
 - Friends and family: Thanks for the moral and practical support throughout this thesis.
 
 ---
