@@ -95,7 +95,7 @@ On the laptop, open PowerShell as administrator and run:
 ```
 to start the system, however to run a simulated veriosn of the drone use, 
 ```bash
-    ./start_sim_local.sh [windown_local_ip]
+    ./start_sim_local.sh [windows_local_ip]
 ```
 to start mavproxy linked with simulated drone.
 
