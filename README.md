@@ -121,4 +121,4 @@ Then, start the backend manually:
 ---
 
 ## Note
-There are some hardcoded IP addresses and paths in some scripts that have to be adapted to the system
+There are some hardcoded IP addresses and paths in the code and scripts that have to be adapted to the system
