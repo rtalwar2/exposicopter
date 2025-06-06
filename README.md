@@ -2,27 +2,6 @@
 
 This repository contains all code, configuration files, and visualizations developed for my master's thesis on drone-based RF-EMF (radio-frequency electromagnetic field) mapping. The system integrates a quadcopter with real-time signal acquisition, flight automation, and interference mitigation strategies for robust wireless exposure measurements.
 
----
-
-## 🚀 Project Overview
-
-The goal of this project is to demonstrate the feasibility of using drones (UAVs) for autonomous RF-EMF measurements in outdoor environments. This includes:
-
-- Developing a drone platform equipped with a broadband RF sensor.
-- Designing a signal-cleaning algorithm to remove onboard electromagnetic interference (EMI).
-- Performing controlled and in-situ validation flights to measure and map EMF exposure.
-
----
-
-## 🧰 Features
-
-- 📡 Real-time electric field strength logging (600–6000 MHz).
-- ✈️ Autonomous flight missions using ArduPilot and MAVLink.
-- 🧹 Signal-cleaning pipeline to suppress EMI from telemetry located in *filter_burst_and_give_mean* function in *helper_functions.py*
-- 📊 Jupyter notebooks for data processing, plotting, and validation.
-- 🧪 Includes turntable experiments and outdoor measurements near base stations.
-
----
 
 ## 🖼 System Architecture
 
