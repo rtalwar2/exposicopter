@@ -2,12 +2,9 @@
 
 This repository contains all code, configuration files, and visualizations developed for my master's thesis on drone-based RF-EMF (radio-frequency electromagnetic field) mapping. The system integrates a quadcopter with real-time signal acquisition, flight automation, and interference mitigation strategies for robust wireless exposure measurements.
 
-
 ## 🖼 System Architecture
 
 ![System Architecture](system_architecture.png) 
-
----
 
 ## ⚙️ System Setup
 
@@ -27,8 +24,6 @@ The system consists of three main components:
 
 3. **Optional: Simulated Environment**  
    If you don’t have a physical drone, use `start_sim_local.sh` to start a simulated ArduPilot drone with MAVProxy locally. This allows full system testing in a virtual environment.
-
----
 
 ## 📁 Repository Structure
 ```bash
@@ -58,10 +53,7 @@ The system consists of three main components:
 ├── RF_analyse.ipynb # notebook use to analyse experiments
 ├── start_sim_local.sh # script to start simulated drone locally 
 └── system_architecture.drawio # system architecture
-
 ```
----
-
 
 ## 🏃‍♂️ How to Run
 On the Raspberry Pi, run:    
@@ -83,20 +75,16 @@ Then, start the backend manually:
     uvicorn backend.main:app --reload
 ```
 
----
-
 ## 🛠 Dependencies
 
 - Python 3.11+
 - requirements.txt
----
 
 ## 🙏 Acknowledgements
 
 - Supervision: Kenneth, Jeroen, Lowie, and Han — thank you for the technical support and guidance.
 - Sparring partner: Jonas
 - Friends and family: Thanks for the moral and practical support throughout this thesis.
----
 
 ## Note
 There are some hardcoded IP addresses and paths in the code and scripts that have to be adapted to the system
