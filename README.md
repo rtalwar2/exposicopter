@@ -18,7 +18,7 @@ The goal of this project is to demonstrate the feasibility of using drones (UAVs
 
 - 📡 Real-time electric field strength logging (600–6000 MHz).
 - ✈️ Autonomous flight missions using ArduPilot and MAVLink.
-- 🧹 Signal-cleaning pipeline to suppress EMI from telemetry.
+- 🧹 Signal-cleaning pipeline to suppress EMI from telemetry located in *filter_burst_and_give_mean* function in *helper_functions.py*
 - 📊 Jupyter notebooks for data processing, plotting, and validation.
 - 🧪 Includes turntable experiments and outdoor measurements near base stations.
 
