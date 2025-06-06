@@ -70,13 +70,14 @@ The system consists of three main components:
 ├───raw-data/ # Raw data from drone interference experiments
 ├───raw-flight-data/ # raw flight data from companion computer flights
 ├───raw-plots/ # drone interference raw data plots
+├── startup_script_hlpers # helper scripts for startup of system
+│ ├── attach_usb_wsl.ps1 # script to attach usb device to WSL
+│ └── start_mavproxy.sh # script to automatically start mavproxy server
 ├── architecture.drawio # system architecture
-├── attach_usb_wsl.ps1 # script to attach usb device to WSL
 ├── automate_everything.ps1 # script to automate MP, mavproxy and USB startup
-├── requirements.txt # requirements file
-├── RF_analyse.ipynb # notebook use to analyse experiments
-├── start_mavproxy.sh # script to automatically start mavproxy server (to be used by automate_everything.ps1)
 ├── start_sim_local.sh # script to start simulated drone locally 
+├── requirements.txt # requirements file
+└── RF_analyse.ipynb # notebook use to analyse experiments
 ```
 ---
 

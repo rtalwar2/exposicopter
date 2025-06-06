@@ -6,12 +6,12 @@ Start-Sleep -Seconds 5  # Give WSL time to boot
 Start-Process "D:\programmas_unif\mission_planner_thesis\MissionPlanner.exe"
 
 # Step 2: Bind USB device
-Set-Location "D:\burgerlijk_ingenieur\2de jaar\thesis\rpi-copy-code-nieuw"
+Set-Location "D:\burgerlijk_ingenieur\2de jaar\thesis\exposicopter\startup_script_helpers"
 .\attach_usb_wsl.ps1
 
 # Step 3: Run command inside WSL (MyUbuntu)
 $wslCommand = @"
-cd /mnt/d/burgerlijk_ingenieur/2de\ jaar/thesis/rpi-copy-code-nieuw
+cd /mnt/d/burgerlijk_ingenieur/2de\ jaar/thesis/exposicopter
 su raman -c 'bash start_mavproxy.sh 172.31.48.1'
 "@
 
