@@ -61,23 +61,25 @@ The system consists of three main components:
 │ ├── helper_functions.py # Utility functions
 │ ├── draaitafel/ # Folder containing code for turntable experiments
 │ └── drone_influence/ # Experiments on drone self-interference
-├── draaitafel-raw-data/ # Raw data from turntable experiments
-├── draaitafel-processed-data/ # Cleaned/processed data from turntable
 ├── Drone/ # Abstraction layer over pymavlink for drone control
 │ └── Drone.py # Exposes high-level drone commands (used by pymavlink_hello_world and backend scripts)
+├── experiment_results/ 
+│ ├── draaitafel-raw-data/ # Raw data from turntable experiments
+│ ├── draaitafel-processed-data/ # Cleaned/processed data from turntable
+│ ├── processed-data/ # processed data from drone interference experiments
+│ ├── raw-data/ # Raw data from drone interference experiments
+│ └── raw-plots/ # drone interference raw data plots
 ├───flight_logs #contains flightlogs for some flights
-├───processed-data/ # processed data from drone interference experiments
-├───raw-data/ # Raw data from drone interference experiments
 ├───raw-flight-data/ # raw flight data from companion computer flights
-├───raw-plots/ # drone interference raw data plots
 ├── startup_script_hlpers # helper scripts for startup of system
 │ ├── attach_usb_wsl.ps1 # script to attach usb device to WSL
 │ └── start_mavproxy.sh # script to automatically start mavproxy server
-├── architecture.drawio # system architecture
 ├── automate_everything.ps1 # script to automate MP, mavproxy and USB startup
-├── start_sim_local.sh # script to start simulated drone locally 
 ├── requirements.txt # requirements file
-└── RF_analyse.ipynb # notebook use to analyse experiments
+├── RF_analyse.ipynb # notebook use to analyse experiments
+├── start_sim_local.sh # script to start simulated drone locally 
+└── system_architecture.drawio # system architecture
+
 ```
 ---
 
