@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # from scipy.signal import lombscargle # Not used in this part
 import warnings
 
-from broadband_probe_helper_functions import read_and_send_data, read_raw_probe_and_burst_analysis # Import warnings module
+from helper_functions import read_and_send_data, read_raw_probe_and_burst_analysis # Import warnings module
 
 # Add the parent directory (where "Drone" resides) to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
