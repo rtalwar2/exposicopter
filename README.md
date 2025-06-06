@@ -55,11 +55,7 @@ The system consists of three main components:
 ```bash
 ├── backend/ # FastAPI backend serving static frontend
 │ ├── main.py # Launches backend and serves frontend
-│ └── frontend/
-│ ├── index.html # Main UI for visualization
-│ ├── main.js # JavaScript logic for plots
-│ ├── plotly_offline.js # Local copy of Plotly
-│ └── assets/ # CSS/JS framework files
+│ └── frontend/ # Contains frontend HTML/CSS/JS code
 ├── companion_computer/ # Code running on drone’s companion computer
 │ ├── pymavlink_hello_world.py # Main script that runs on the Pi
 │ ├── helper_functions.py # Utility functions
