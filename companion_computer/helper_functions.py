@@ -47,18 +47,16 @@ def read_probe_raw_and_write_to_csv(broadband_probe):
 def filter_burst_and_give_mean(broadband_probe,data_dict):
 
     # --- Parameters ---
-    # start_time = 11.8 # Set to None or 0 to use all data initially
-    # end_time = 13.9   # Set to None to use all data initially
-    start_time = None # Set to None or 0 to use all data initially
-    end_time = None
+    start_time = 0.2 # Set to None or ignore first 200 ms
+    end_time = 1000
     # Parameters for Burst Identification
     initial_threshold_dbm = -40.0 # Amplitude threshold to identify POTENTIAL burst points
     max_intra_burst_gap = 0.01 # Max time gap WITHIN a single burst (tune based on sampling rate)
 
     # Parameters for Filtering Identified Bursts by Duration
     # *** Use values based on your "Histogram of Burst Durations" ***
-    min_acceptable_telemetry_duration = 0.0098 # Example: Lower bound from histogram
-    max_acceptable_telemetry_duration = 0.11 # Example: Upper bound from histogram
+    min_acceptable_telemetry_duration = 0.0098 # Lower bound from histogram
+    max_acceptable_telemetry_duration = 0.11 # Upper bound from histogram
 
     # ***----------------------------------------------------***
 
@@ -172,7 +170,6 @@ def filter_burst_and_give_mean(broadband_probe,data_dict):
                 burst_points = df_filtered.loc[event['original_indices'], "dBm"]
 
                 # --- Outlier Detection ---
-                # Example: Define outliers as points > 2 standard deviations from mean
                 median_dbm = burst_points.median()
 
                 threshold = 1  
@@ -202,7 +199,7 @@ def filter_burst_and_give_mean(broadband_probe,data_dict):
         else:
             df_final_filtered = df_filtered.copy() # No points to remove
 
-    return np.mean(df_final_filtered["dBm"])
+    return np.round(np.mean(df_final_filtered["dBm"]),decimals=2)
 
 
 def read_raw_probe_and_burst_analysis(broadband_probe,lat,lon):
@@ -274,6 +271,6 @@ def read_probe_processed(broadband_probe):
 def read_and_send_data(drone,broadband_probe,current_lat,current_lon):
     average_5_s=read_raw_probe_and_burst_analysis(broadband_probe,current_lat,current_lon)
     print("mean median "+ str(average_5_s))
-    drone.send_measurement_data(current_lat,current_lon,1.5,average_5_s)
-
+    alt=drone.get_sonar_range()
+    drone.send_measurement_data(current_lat,current_lon,alt,average_5_s)
 ###################################################################################################

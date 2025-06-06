@@ -117,7 +117,6 @@ Then, start the backend manually:
 - Supervision: Kenneth, Jeroen, Lowie, and Han — thank you for the technical support and guidance.
 - Sparring partner: Jonas
 - Friends and family: Thanks for the moral and practical support throughout this thesis.
-
 ---
 
 ## Note
