@@ -184,7 +184,7 @@ def filter_burst_and_give_mean(broadband_probe,data_dict):
                 # Update: Only remove the good (non-outlier) points
                 indices_to_remove.update(good_indices)
                 outliers_not_removed.update(bad_indices)
-                # Also optionally store the filtered event if you want
+                # Also optionally store the filtered event
                 filtered_event = event.copy()
                 filtered_event['original_indices'] = good_indices
                 confirmed_telemetry_events.append(filtered_event)
