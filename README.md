@@ -18,7 +18,7 @@ The goal of this project is to demonstrate the feasibility of using drones (UAVs
 
 - 📡 Real-time electric field strength logging (600–6000 MHz).
 - ✈️ Autonomous flight missions using ArduPilot and MAVLink.
-- 🧹 Signal-cleaning pipeline to suppress EMI from telemetry and internal electronics.
+- 🧹 Signal-cleaning pipeline to suppress EMI from telemetry.
 - 📊 Jupyter notebooks for data processing, plotting, and validation.
 - 🧪 Includes turntable experiments and outdoor measurements near base stations.
 
@@ -77,7 +77,7 @@ The system consists of three main components:
 ├── architecture.drawio # system architecture
 ├── attach_usb_wsl.ps1 # script to attach usb device to WSL
 ├── automate_everything.ps1 # script to automate MP, mavproxy and USB startup
-├── requirements.txt # recuirements file
+├── requirements.txt # requirements file
 ├── RF_analyse.ipynb # notebook use to analyse experiments
 ├── start_mavproxy.sh # script to automatically start mavproxy server (to be used by automate_everything.ps1)
 ├── start_sim_local.sh # script to start simulated drone locally 
