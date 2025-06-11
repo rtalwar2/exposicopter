@@ -27,6 +27,7 @@ The system consists of three main components:
 
 ## 📁 Repository Structure
 ```bash
+├── params/ # parameters of quadcopter
 ├── backend/ # FastAPI backend serving static frontend
 │ ├── main.py # Launches backend and serves frontend
 │ └── frontend/ # Contains frontend HTML/CSS/JS code
