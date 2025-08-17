@@ -2,7 +2,7 @@
 
 This repository contains all code, configuration files, and visualizations developed for my master's thesis on drone-based RF-EMF (radio-frequency electromagnetic field) mapping. The system integrates a quadcopter with real-time signal acquisition, flight automation, and interference mitigation strategies for robust wireless exposure measurements.
 
-This barnch serves as a guide for future students to understand, set up, and continue the development of this project.
+This branch serves as a guide for future students to understand, set up, and continue the development of this project.
 
 ## 📁 Repository Structure
 ```bash
