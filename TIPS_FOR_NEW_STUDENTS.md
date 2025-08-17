@@ -42,6 +42,7 @@ If you run into issues, check these common problems first.
 *   **Check Your Windows Firewall Rules**: A very common issue when running this setup on Windows + WSL2 is that the Windows Firewall blocks communication. If Mission Planner, MAVProxy (in WSL), or your Python backend script cannot connect to each other, **triple-check your firewall rules**. You may need to create an explicit inbound rule to allow Python or other applications to accept connections.
 *   **Verify IP Addresses and Ports**: The system relies on communication between different components using IP addresses (especially for WSL). If things aren't connecting, ensure that the IP addresses in the scripts (`backend/main.py`, `automate_everything.ps1`, etc.) match the current IP address of your WSL instance.
 *   **Read the ArduPilot Documentation**: The ArduPilot wiki is an incredibly valuable resource. If you have questions about flight modes, parameters, or MAVLink commands, the answer is most likely there. Also don't hesitate to ask me questions about the drone.
+*   **ESC Configurator**: When wanting to update the ESC firmware and not being able to connect to the ESC's, disconnect the GPS and telemetry cable from the flight controller and also turn of the RC, these can cause interference.
 
 ## 🔩 Hardware Information
 
