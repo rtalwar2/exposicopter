@@ -1,6 +1,6 @@
 #!/bin/bash
 # Make sure to execute this as non-root or else sim_vehicle.py will not be found
-# Argument is the local WSL address, e.g., 172.31.48.1
+# Argument is the local WSL address when looking from your windows machine, e.g., 172.31.48.1
 
 # Check if argument is provided
 if [ -z "$1" ]; then
