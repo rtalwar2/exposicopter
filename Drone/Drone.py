@@ -53,7 +53,7 @@ class Drone:
         return waypoints[1:] #first is home waypoint don't add that
 
 
-    # Function to request GLOBAL_POSITION_INT message
+    # Function to request GLOBAL_TARGET_POSITION_INT message
     def request_global_target_position_int(self):
         print("Requesting POSITION_TARGET_GLOBAL_INT...")
         self.connection.mav.command_long_send(
@@ -76,11 +76,10 @@ class Drone:
             33,         # ID for GLOBAL_POSITION_INT
             0, 0, 0, 0, 0, 0  # Unused parameters
         )
-
     def get_global_target_position(self):
-            self.request_global_target_position_int()
-            msg = self.connection.recv_match(type='POSITION_TARGET_GLOBAL_INT', blocking=True)
-            return msg
+        self.request_global_target_position_int()
+        msg = self.connection.recv_match(type='POSITION_TARGET_GLOBAL_INT', blocking=True)
+        return msg
 
     def get_global_position(self):
         self.request_global_position_int()
